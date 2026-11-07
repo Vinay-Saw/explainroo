@@ -212,8 +212,15 @@ export function normalizeConfig(raw, dir = '.') {
   }
   if (!(cfg.loudness <= -8 && cfg.loudness >= -30)) fail('loudness must be between -30 and -8 LUFS');
   if (!(cfg.boil >= 0 && cfg.boil <= 12)) fail('boil must be between 0 (off) and 12 redraws per second');
-  if (cfg.watermark !== false && !(typeof cfg.watermark === 'string' && cfg.watermark.trim() && cfg.watermark.length <= 40)) {
-    fail('watermark must be false or a short text of up to 40 characters, like "example.com"');
+  const wmImage = cfg.watermark && typeof cfg.watermark === 'object' && !Array.isArray(cfg.watermark);
+  if (wmImage) {
+    const extra = Object.keys(cfg.watermark).filter((k) => k !== 'image');
+    if (extra.length) fail(`watermark has unknown setting(s): ${extra.join(', ')}. Known: image`);
+    if (!(typeof cfg.watermark.image === 'string' && /^assets\/.+\.(svg|png|webp|jpe?g)$/i.test(cfg.watermark.image))) {
+      fail('watermark.image must be an image in the assets/ folder, like "assets/watermark.svg"');
+    }
+  } else if (cfg.watermark !== false && !(typeof cfg.watermark === 'string' && cfg.watermark.trim() && cfg.watermark.length <= 40)) {
+    fail('watermark must be false, a short text of up to 40 characters like "example.com", or { "image": "assets/logo.svg" }');
   }
   if (cfg.images !== null) {
     if (typeof cfg.images !== 'object' || Array.isArray(cfg.images)) fail('images must be an object like { "model": "best", "style": "..." }');
@@ -296,7 +303,7 @@ export function loadProject(arg, { size } = {}) {
     fail(`video.json is not valid JSON: ${e.message}`);
   }
   const config = normalizeConfig(size === undefined ? raw : { ...raw, size }, dir);
-  for (const f of [...config.fonts.map((x) => x.src), ...(config.brand?.logo ? [config.brand.logo] : [])]) {
+  for (const f of [...config.fonts.map((x) => x.src), ...(config.brand?.logo ? [config.brand.logo] : []), ...(config.watermark?.image ? [config.watermark.image] : [])]) {
     if (!fs.existsSync(path.join(dir, f))) fail(`${f} is listed in video.json but the file is missing`);
   }
   const scriptPath = path.join(dir, 'script.md');

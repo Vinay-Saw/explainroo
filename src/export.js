@@ -169,6 +169,8 @@ export async function exportPlayer(project, { out, log = () => {} } = {}) {
     if (outside) throw new Error('the project uses an outside URL. Use local files before exporting.');
     used.modules = [...projectModules];
     for (const f of project.config.fonts) if (used.fonts.includes(f.family)) used.assets.push(f.src);
+    const wmImage = project.config.watermark?.image;
+    if (wmImage && !used.assets.includes(wmImage)) used.assets.push(wmImage);
     copyPlayer(project, timeline, used, temp);
     const mix = path.join(project.paths.build, 'player-mix.wav');
     const norm = path.join(project.paths.build, 'player-mix-norm.wav');

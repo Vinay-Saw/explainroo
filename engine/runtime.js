@@ -381,8 +381,34 @@ export class Engine {
     }
     if (this.config.watermark) {
       ctx.setTransform(this.scale, 0, 0, this.scale, 0, 0);
-      this.drawWatermark(ctx, this.config.watermark);
+      if (typeof this.config.watermark === 'object') this.drawWatermarkImage(ctx, this.image(this.config.watermark.image));
+      else this.drawWatermark(ctx, this.config.watermark);
     }
+  }
+
+  // A logo in the watermark's corner, on the same soft backing and in the same
+  // box height as the text watermark, so the layout and captions stay put.
+  drawWatermarkImage(ctx, img) {
+    const th = this.theme;
+    const m = Math.min(this.W, this.H);
+    const size = Math.round(m * 0.028);
+    const margin = Math.round(m * 0.028);
+    const h = size * 1.6;
+    const ih = h * 0.72;
+    const iw = ih * (img.naturalWidth || img.width) / (img.naturalHeight || img.height);
+    const padX = h * 0.32;
+    const x = this.appArea ? this.appArea.right : this.W - margin;
+    const y = this.appArea ? this.appArea.top + h / 2 : this.H - margin - h / 2;
+    ctx.save();
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = withAlpha(th.bg, 0.72);
+    ctx.beginPath();
+    ctx.roundRect(x - iw - padX * 2, y - h / 2, iw + padX * 2, h, h / 2);
+    ctx.fill();
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, x - iw - padX, y - ih / 2, iw, ih);
+    ctx.restore();
   }
 
   // Small text in the bottom right corner of every frame, on a soft backing

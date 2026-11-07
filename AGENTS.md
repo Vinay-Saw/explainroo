@@ -872,7 +872,7 @@ videos/<name>/
 | `sentenceGap`, `paragraphGap` | 0.3, 0.55 | pauses in generated narration; recordings keep their own pauses |
 | `loudness` | -14 | target loudness in LUFS |
 | `boil` | 0 | redraws per second of hand-drawn lines; 0 keeps them still |
-| `watermark` | `"explainroo.com"` | small text in a corner, or `false` |
+| `watermark` | `"explainroo.com"` | small text in a corner, `{ "image": "assets/logo.svg" }` for a logo there, or `false` |
 | `images` | none | `{ "model": "best" or "cheap", "style": "..." }` |
 | `brand` | none | colors, fonts and logo for `s.ui`, see [Product demos](#product-demos) |
 | `fonts` | none | the video's own font files, see [Product demos](#product-demos) |
