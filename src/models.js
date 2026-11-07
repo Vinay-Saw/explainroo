@@ -6,7 +6,9 @@ import path from 'node:path';
 
 export const TTS_MODEL = 'onnx-community/Kokoro-82M-v1.0-ONNX';
 export const ASR_MODEL = 'onnx-community/whisper-base.en_timestamped';
-export const MULTILINGUAL_ASR_MODEL = 'onnx-community/whisper-small_timestamped';
+// EXPLAINROO_ASR_MODEL swaps the speech check model for languages other than
+// English, for example onnx-community/whisper-large-v3-turbo_timestamped.
+export const MULTILINGUAL_ASR_MODEL = process.env.EXPLAINROO_ASR_MODEL || 'onnx-community/whisper-small_timestamped';
 export const TTS_SAMPLE_RATE = 24000;
 
 export const LANGUAGES = {
