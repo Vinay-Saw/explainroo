@@ -121,8 +121,8 @@ window.explainrooReady = (async () => {
     check(step, viewWidth) {
       return engine.check(step, viewWidth);
     },
-    async soundtrack(path) {
-      const { buffer, cues, errors } = await renderAudio(engine, audio);
+    async soundtrack(path, opts = {}) {
+      const { buffer, cues, errors } = await renderAudio(engine, audio, opts);
       if (errors.length) throw new Error(errors.map((e) => `scene "${e.scene}" at ${e.t.toFixed(2)}s: ${e.message}`).join('\n'));
       await upload(path, audio.encodeWav(buffer));
       return { cues: cues.length, duration: buffer.duration };

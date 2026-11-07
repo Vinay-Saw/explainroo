@@ -698,14 +698,16 @@ export async function boot({ canvas, scale = 1, transparent = false, version = '
 }
 
 // Mixes narration, music and sound effects in an OfflineAudioContext.
-export async function renderAudio(engine, audio, { sampleRate = 48000 } = {}) {
+// noVoice leaves the narration out but keeps the music ducking where it spoke: a
+// music-and-effects bed for dubbing the same video into another language.
+export async function renderAudio(engine, audio, { sampleRate = 48000, noVoice = false } = {}) {
   if (audio.loadError) throw new Error(`audio engine failed to load: ${audio.loadError.message}`);
   const { timeline, config } = engine.state;
   const { cues, clips, errors } = engine.sfxCues();
   const buffer = await audio.renderSoundtrack({
     duration: timeline.duration,
     sampleRate,
-    voice: timeline.scenes.filter((s) => s.voice).map((s) => ({ url: '/project/' + s.voice.url + '?v=' + engine.state.version, start: s.voice.start })),
+    voice: noVoice ? [] : timeline.scenes.filter((s) => s.voice).map((s) => ({ url: '/project/' + s.voice.url + '?v=' + engine.state.version, start: s.voice.start })),
     voiceSpans: timeline.voiceSpans,
     music: config.music,
     sfx: cues,
